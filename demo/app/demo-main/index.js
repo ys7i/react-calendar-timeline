@@ -6,7 +6,8 @@ import Timeline, {
   TimelineMarkers,
   TodayMarker,
   CustomMarker,
-  CursorMarker
+  CursorMarker,
+  AutoSizer
 } from 'react-calendar-timeline'
 
 import generateFakeData from '../generate-fake-data'
@@ -145,56 +146,58 @@ export default class App extends Component {
     const { groups, items, defaultTimeStart, defaultTimeEnd } = this.state
 
     return (
-      <Timeline
-        groups={groups}
-        items={items}
-        keys={keys}
-        sidebarWidth={150}
-        sidebarContent={<div>Above The Left</div>}
-        canMove
-        canResize="right"
-        canSelect
-        itemsSorted
-        itemTouchSendsClick={false}
-        stackItems
-        itemHeightRatio={0.75}
-        defaultTimeStart={defaultTimeStart}
-        defaultTimeEnd={defaultTimeEnd}
-        onCanvasClick={this.handleCanvasClick}
-        onCanvasDoubleClick={this.handleCanvasDoubleClick}
-        onCanvasContextMenu={this.handleCanvasContextMenu}
-        onItemClick={this.handleItemClick}
-        onItemSelect={this.handleItemSelect}
-        onItemContextMenu={this.handleItemContextMenu}
-        onItemMove={this.handleItemMove}
-        onItemResize={this.handleItemResize}
-        onItemDoubleClick={this.handleItemDoubleClick}
-        onTimeChange={this.handleTimeChange}
-        moveResizeValidator={this.moveResizeValidator}
-      >
-        <TimelineMarkers>
-          <TodayMarker />
-          <CustomMarker
-            date={
-              moment()
-                .startOf('day')
-                .valueOf() +
-              1000 * 60 * 60 * 2
-            }
-          />
-          <CustomMarker
-            date={moment()
-              .add(3, 'day')
-              .valueOf()}
-          >
-            {({ styles }) => {
-              const newStyles = { ...styles, backgroundColor: 'blue' }
-              return <div style={newStyles} />
-            }}
-          </CustomMarker>
-          <CursorMarker />
-        </TimelineMarkers>
-      </Timeline>
+      <AutoSizer>
+        <Timeline
+          groups={groups}
+          items={items}
+          keys={keys}
+          sidebarWidth={150}
+          sidebarContent={<div>Above The Left</div>}
+          canMove
+          canResize="right"
+          canSelect
+          itemsSorted
+          itemTouchSendsClick={false}
+          stackItems
+          itemHeightRatio={0.75}
+          defaultTimeStart={defaultTimeStart}
+          defaultTimeEnd={defaultTimeEnd}
+          onCanvasClick={this.handleCanvasClick}
+          onCanvasDoubleClick={this.handleCanvasDoubleClick}
+          onCanvasContextMenu={this.handleCanvasContextMenu}
+          onItemClick={this.handleItemClick}
+          onItemSelect={this.handleItemSelect}
+          onItemContextMenu={this.handleItemContextMenu}
+          onItemMove={this.handleItemMove}
+          onItemResize={this.handleItemResize}
+          onItemDoubleClick={this.handleItemDoubleClick}
+          onTimeChange={this.handleTimeChange}
+          moveResizeValidator={this.moveResizeValidator}
+        >
+          <TimelineMarkers>
+            <TodayMarker />
+            <CustomMarker
+              date={
+                moment()
+                  .startOf('day')
+                  .valueOf() +
+                1000 * 60 * 60 * 2
+              }
+            />
+            <CustomMarker
+              date={moment()
+                .add(3, 'day')
+                .valueOf()}
+            >
+              {({ styles }) => {
+                const newStyles = { ...styles, backgroundColor: 'blue' }
+                return <div style={newStyles} />
+              }}
+            </CustomMarker>
+            <CursorMarker />
+          </TimelineMarkers>
+        </Timeline>
+      </AutoSizer>
     )
   }
 }

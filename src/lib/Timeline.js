@@ -33,6 +33,11 @@ import {
 import { TimelineStateProvider } from './timeline/TimelineStateContext'
 import { TimelineMarkersProvider } from './markers/TimelineMarkersContext'
 
+const calculateTopOffset = (props, containerTop) => {
+  const { headerLabelGroupHeight, headerLabelHeight } = props
+  const headerHeight = headerLabelGroupHeight + headerLabelHeight
+  return containerTop + window.pageYOffset + headerHeight
+}
 export default class ReactCalendarTimeline extends Component {
   static propTypes = {
     groups: PropTypes.oneOfType([PropTypes.array, PropTypes.object]).isRequired,
@@ -155,7 +160,10 @@ export default class ReactCalendarTimeline extends Component {
       removeListener: PropTypes.func
     }),
 
-    children: PropTypes.node
+    children: PropTypes.node,
+    // TODO: issue warning if width and topOffset not provided
+    initialContainerWidth: PropTypes.number,
+    initialTopOffset: PropTypes.number
   }
 
   static defaultProps = {
@@ -283,22 +291,53 @@ export default class ReactCalendarTimeline extends Component {
         'You must provide either "defaultTimeStart" and "defaultTimeEnd" or "visibleTimeStart" and "visibleTimeEnd" to initialize the Timeline'
       )
     }
+    const {
+      initialContainerWidth,
+      sidebarWidth,
+      rightSidebarWidth
+    } = this.props
+
+    let canvasWidth = initialContainerWidth - sidebarWidth - rightSidebarWidth
 
     this.state = {
-      width: 1000,
+      width: canvasWidth,
 
-      visibleTimeStart: visibleTimeStart,
-      visibleTimeEnd: visibleTimeEnd,
+      topOffset: calculateTopOffset(this.props, this.props.initialTopOffset),
+
+      visibleTimeStart,
+      visibleTimeEnd,
       canvasTimeStart: visibleTimeStart - (visibleTimeEnd - visibleTimeStart),
 
       selectedItem: null,
       dragTime: null,
       dragGroupTitle: null,
       resizeTime: null,
-      topOffset: 0,
       resizingItem: null,
       resizingEdge: null
     }
+
+    // const { dimensionItems, height, groupHeights, groupTops } = this.stackItems(
+    //   props.items,
+    //   props.groups,
+    //   this.state.canvasTimeStart,
+    //   this.state.visibleTimeStart,
+    //   this.state.visibleTimeEnd,
+    //   this.state.width
+    // )
+
+    /* eslint-disable react/no-direct-mutation-state */
+    // this.state.dimensionItems = dimensionItems
+    // this.state.height = height
+    // this.state.groupHeights = groupHeights
+    // this.state.groupTops = groupTops
+
+    /* eslint-enable */
+
+    /* copied from resize */
+    // const {
+    //   width: containerWidth,
+    //   top: containerTop
+    // } = this.container.getBoundingClientRect()
 
     const { dimensionItems, height, groupHeights, groupTops } = this.stackItems(
       props.items,
@@ -306,21 +345,35 @@ export default class ReactCalendarTimeline extends Component {
       this.state.canvasTimeStart,
       this.state.visibleTimeStart,
       this.state.visibleTimeEnd,
-      this.state.width
+      canvasWidth
     )
 
-    /* eslint-disable react/no-direct-mutation-state */
-    this.state.dimensionItems = dimensionItems
-    this.state.height = height
-    this.state.groupHeights = groupHeights
-    this.state.groupTops = groupTops
+    // const { headerLabelGroupHeight, headerLabelHeight } = props
+    // const headerHeight = headerLabelGroupHeight + headerLabelHeight
+    // // this is needed by dragItem since it uses pageY from the drag events
+    // // if this was in the context of the scrollElement, this would not be necessary
+    // const topOffset = containerTop + window.pageYOffset + headerHeight
+    // const topOffset = calculateTopOffset(this.props, containerTop)
 
-    /* eslint-enable */
+    // this.setState({
+    //   width,
+    //   topOffset,
+    //   dimensionItems,
+    //   height,
+    //   groupHeights,
+    //   groupTops
+    // })
+
+    this.state = {
+      ...this.state,
+      dimensionItems,
+      height,
+      groupHeights,
+      groupTops
+    }
   }
 
   componentDidMount() {
-    this.resize(this.props)
-
     if (this.props.resizeDetector && this.props.resizeDetector.addListener) {
       this.props.resizeDetector.addListener(this)
     }
@@ -328,6 +381,13 @@ export default class ReactCalendarTimeline extends Component {
     windowResizeDetector.addListener(this)
 
     this.lastTouchDistance = null
+    const {
+      initialContainerWidth,
+      sidebarWidth,
+      rightSidebarWidth
+    } = this.props
+    const scrollWidth = initialContainerWidth + sidebarWidth + rightSidebarWidth
+    this.scrollComponent.scrollLeft = scrollWidth
   }
 
   componentWillUnmount() {
@@ -345,8 +405,6 @@ export default class ReactCalendarTimeline extends Component {
     } = this.container.getBoundingClientRect()
 
     let width = containerWidth - props.sidebarWidth - props.rightSidebarWidth
-    const { headerLabelGroupHeight, headerLabelHeight } = props
-    const headerHeight = headerLabelGroupHeight + headerLabelHeight
 
     const { dimensionItems, height, groupHeights, groupTops } = this.stackItems(
       props.items,
@@ -357,9 +415,12 @@ export default class ReactCalendarTimeline extends Component {
       width
     )
 
-    // this is needed by dragItem since it uses pageY from the drag events
-    // if this was in the context of the scrollElement, this would not be necessary
-    const topOffset = containerTop + window.pageYOffset + headerHeight
+    // const { headerLabelGroupHeight, headerLabelHeight } = props
+    // const headerHeight = headerLabelGroupHeight + headerLabelHeight
+    // // this is needed by dragItem since it uses pageY from the drag events
+    // // if this was in the context of the scrollElement, this would not be necessary
+    // const topOffset = containerTop + window.pageYOffset + headerHeight
+    const topOffset = calculateTopOffset(this.props, containerTop)
 
     this.setState({
       width,
@@ -374,6 +435,7 @@ export default class ReactCalendarTimeline extends Component {
 
   // FIXME: this function calls set state EVERY TIME YOU SCROLL
   onScroll = scrollX => {
+    console.log('on scroll called')
     const canvasTimeStart = this.state.canvasTimeStart
 
     const zoom = this.state.visibleTimeEnd - this.state.visibleTimeStart
@@ -408,6 +470,7 @@ export default class ReactCalendarTimeline extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log('component will receive props')
     const {
       visibleTimeStart,
       visibleTimeEnd,
@@ -884,6 +947,7 @@ export default class ReactCalendarTimeline extends Component {
   }
 
   componentDidUpdate() {
+    console.log('component did update')
     this.headerScrollListener(this.state.currentScrollLeft)
   }
 

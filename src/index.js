@@ -6,5 +6,6 @@ export {
 export { default as TodayMarker } from './lib/markers/public/TodayMarker'
 export { default as CustomMarker } from './lib/markers/public/CustomMarker'
 export { default as CursorMarker } from './lib/markers/public/CursorMarker'
+export { default as AutoSizer } from './lib/AutoSizer'
 
 export default Timeline
