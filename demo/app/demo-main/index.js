@@ -29,7 +29,7 @@ export default class App extends Component {
   constructor(props) {
     super(props)
 
-    const { groups, items } = generateFakeData()
+    const { groups, items } = generateFakeData(3, 10, 1)
     const defaultTimeStart = moment()
       .startOf('day')
       .toDate()
@@ -42,7 +42,8 @@ export default class App extends Component {
       groups,
       items,
       defaultTimeStart,
-      defaultTimeEnd
+      defaultTimeEnd,
+      selected: []
     }
   }
 
@@ -64,6 +65,14 @@ export default class App extends Component {
 
   handleItemSelect = (itemId, _, time) => {
     console.log('Selected: ' + itemId, moment(time).format())
+    this.setState({selected : [itemId]})
+  }
+
+  handleItemDeselect= ()=>{
+    console.log('deselect')
+    this.setState({
+      selected: []
+    })
   }
 
   handleItemDoubleClick = (itemId, _, time) => {
@@ -186,12 +195,14 @@ export default class App extends Component {
         onCanvasContextMenu={this.handleCanvasContextMenu}
         onItemClick={this.handleItemClick}
         onItemSelect={this.handleItemSelect}
+        onItemDeselect={this.handleItemDeselect}
         onItemContextMenu={this.handleItemContextMenu}
         onItemMove={this.handleItemMove}
         onItemResize={this.handleItemResize}
         onItemDoubleClick={this.handleItemDoubleClick}
         onTimeChange={this.handleTimeChange}
         moveResizeValidator={this.moveResizeValidator}
+        selected={this.state.selected}
       />
     )
   }

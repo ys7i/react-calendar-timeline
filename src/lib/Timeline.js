@@ -270,6 +270,8 @@ export default class ReactCalendarTimeline extends Component {
 
   constructor(props) {
     super(props)
+    this.getSelected = this.getSelected.bind(this)
+    this.hasSelectedItem = this.hasSelectedItem.bind(this)
 
     let visibleTimeStart = null
     let visibleTimeEnd = null
@@ -608,7 +610,7 @@ export default class ReactCalendarTimeline extends Component {
 
   selectItem = (item, clickType, e) => {
     if (
-      this.state.selectedItem === item ||
+      this.isItemSelected(item) ||
       (this.props.itemTouchSendsClick && clickType === 'touch')
     ) {
       if (item && this.props.onItemClick) {
@@ -700,7 +702,7 @@ export default class ReactCalendarTimeline extends Component {
 
     // if not clicking on an item
     if (!hasSomeParentTheClass(e.target, 'rct-item')) {
-      if (this.state.selectedItem) {
+      if (this.hasSelectedItem()) {
         this.selectItem(null)
       } else if (this.props.onCanvasClick) {
         const [row, time] = this.rowAndTimeFromScrollAreaEvent(e)
@@ -1276,9 +1278,7 @@ export default class ReactCalendarTimeline extends Component {
       groupHeights: groupHeights,
       groupTops: groupTops,
       selected:
-        this.state.selectedItem && !this.props.selected
-          ? [this.state.selectedItem]
-          : this.props.selected || [],
+        this.getSelected(),
       height: height,
       headerHeight: headerHeight,
       minUnit: minUnit,
@@ -1288,6 +1288,22 @@ export default class ReactCalendarTimeline extends Component {
     return React.Children.map(childArray, child =>
       React.cloneElement(child, childProps)
     )
+  }
+
+  getSelected() {
+    return this.state.selectedItem && !this.props.selected
+      ? [this.state.selectedItem]
+      : this.props.selected || [];
+  }
+
+  hasSelectedItem(){
+    if(!Array.isArray(this.props.selected)) return !!this.state.selectedItem
+    return this.props.selected.length > 0
+  }
+
+  isItemSelected(itemId){
+    const selectedItems = this.getSelected()
+    return selectedItems.some(i => i === itemId)
   }
 
   render() {
@@ -1314,7 +1330,7 @@ export default class ReactCalendarTimeline extends Component {
       cursorTime
     } = this.state
     let { dimensionItems, height, groupHeights, groupTops } = this.state
-
+    console.log(this.props.selected)
     const zoom = visibleTimeEnd - visibleTimeStart
     const canvasTimeEnd = canvasTimeStart + zoom * 3
     const canvasWidth = width * 3
