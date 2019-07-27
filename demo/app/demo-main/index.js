@@ -51,7 +51,9 @@ export default class App extends Component {
       groups,
       items,
       defaultTimeStart,
-      defaultTimeEnd
+      defaultTimeEnd,
+      links: [],
+      linkSource: undefined,
     }
   }
 
@@ -73,6 +75,16 @@ export default class App extends Component {
 
   handleItemSelect = (itemId, _, time) => {
     console.log('Selected: ' + itemId, moment(time).format())
+    if(!itemId) return
+    if(!this.state.linkSource){
+      this.setState({linkSource: itemId})
+    }
+    else {
+      this.setState(state => ({
+        links: [...state.links, {src: state.linkSource, target: itemId}],
+        linkSource: undefined,
+      }))
+    }
   }
 
   handleItemDoubleClick = (itemId, _, time) => {
@@ -175,6 +187,7 @@ export default class App extends Component {
         onItemDoubleClick={this.handleItemDoubleClick}
         onTimeChange={this.handleTimeChange}
         moveResizeValidator={this.moveResizeValidator}
+        links={this.state.links}
       >
         <TimelineMarkers>
           <TodayMarker />

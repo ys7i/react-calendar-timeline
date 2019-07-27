@@ -8,7 +8,7 @@ import Columns from './columns/Columns'
 import GroupRows from './row/GroupRows'
 import ScrollElement from './scroll/ScrollElement'
 import MarkerCanvas from './markers/MarkerCanvas'
-
+import * as d3 from 'd3'
 import windowResizeDetector from '../resize-detector/window'
 
 import {
@@ -157,7 +157,9 @@ export default class ReactCalendarTimeline extends Component {
 
     verticalLineClassNamesForTime: PropTypes.func,
 
-    children: PropTypes.node
+    children: PropTypes.node,
+
+    links: PropTypes.arrayOf(PropTypes.object)
   }
 
   static defaultProps = {
@@ -232,7 +234,9 @@ export default class ReactCalendarTimeline extends Component {
     headerLabelFormats: defaultHeaderLabelFormats,
     subHeaderLabelFormats: defaultSubHeaderLabelFormats,
 
-    selected: null
+    selected: null,
+
+    links: []
   }
 
   static childContextTypes = {
@@ -335,6 +339,10 @@ export default class ReactCalendarTimeline extends Component {
     this.state.groupTops = groupTops
 
     /* eslint-enable */
+  }
+
+  getItemDimentionsById = (id, items) => {
+    return items.find(i => i.id === id)
   }
 
   componentDidMount() {
@@ -950,6 +958,55 @@ export default class ReactCalendarTimeline extends Component {
     this.scrollComponent = el
   }
 
+  getLinksItems = (links, items) => {
+    return links.map(link => ({
+      target: this.getItemDimentionsById(link.target, items),
+      src: this.getItemDimentionsById(link.src, items)
+    }))
+  }
+
+  renderLinks = (dimensionItems, links) => {
+    const itemLinks = this.getLinksItems(links, dimensionItems)
+    const lineGenerator = d3.line()
+    return (
+      <div>
+        {itemLinks.map(link => {
+          console.log([
+            link.target.dimensions.left - link.src.dimensions.left,
+            link.target.dimensions.top - link.src.dimensions.top
+          ])
+          const endPoint = [
+            link.target.dimensions.left - link.src.dimensions.left,
+            link.target.dimensions.top - link.src.dimensions.top
+          ];
+          return (
+            <svg
+              key={link.src.id + link.src.target}
+              style={{
+                position: 'absolute',
+                left: link.src.dimensions.left,
+                zIndex: 200,
+                top: link.src.dimensions.top,
+                height: endPoint[1],
+                width: endPoint[0]
+              }}
+            >
+              <path
+                d={lineGenerator([
+                  [0, 0],
+                  endPoint
+                ])}
+                stroke="red"
+                strokeWidth="2"
+                fill="none"
+              />
+            </svg>
+          )
+        })}
+      </div>
+    )
+  }
+
   render() {
     const {
       items,
@@ -957,7 +1014,8 @@ export default class ReactCalendarTimeline extends Component {
       sidebarWidth,
       rightSidebarWidth,
       timeSteps,
-      traditionalZoom
+      traditionalZoom,
+      links
     } = this.props
     const {
       draggingItem,
@@ -1041,6 +1099,7 @@ export default class ReactCalendarTimeline extends Component {
                   isInteractingWithItem={isInteractingWithItem}
                 >
                   <MarkerCanvas>
+                    {this.renderLinks(dimensionItems, links)}
                     {this.items(
                       canvasTimeStart,
                       zoom,
