@@ -971,10 +971,6 @@ export default class ReactCalendarTimeline extends Component {
     return (
       <div>
         {itemLinks.map(link => {
-          console.log([
-            link.target.dimensions.left - link.src.dimensions.left,
-            link.target.dimensions.top - link.src.dimensions.top
-          ])
           const endPoint = [
             link.target.dimensions.left - link.src.dimensions.left,
             link.target.dimensions.top - link.src.dimensions.top
@@ -988,7 +984,8 @@ export default class ReactCalendarTimeline extends Component {
                 zIndex: 200,
                 top: link.src.dimensions.top,
                 height: endPoint[1],
-                width: endPoint[0]
+                //handle case where endPoint is 0
+                width: endPoint[0] > 2? endPoint[0] : 2
               }}
             >
               <path
