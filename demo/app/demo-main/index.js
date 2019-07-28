@@ -52,7 +52,7 @@ export default class App extends Component {
       items,
       defaultTimeStart,
       defaultTimeEnd,
-      links: [],
+      links: [{src:'66', target: '35'}],
       linkSource: undefined,
     }
   }

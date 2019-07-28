@@ -966,33 +966,37 @@ export default class ReactCalendarTimeline extends Component {
   }
 
   renderLinks = (dimensionItems, links) => {
-    const itemLinks = this.getLinksItems(links, dimensionItems)
+    const itemLinks = this.getLinksItems(links, dimensionItems).map(i => {
+      const startLink = [i.src.dimensions.left, i.src.dimensions.top]
+      const endLink = [i.target.dimensions.left, i.target.dimensions.top]
+      const isEndLinkBeforeStart = endLink[0] <= startLink[0] || endLink[1] <= startLink[1]
+      if(isEndLinkBeforeStart) return [endLink, startLink]
+      return [startLink, endLink]
+    })
     const lineGenerator = d3.line()
     return (
       <div>
-        {itemLinks.map(link => {
+        {itemLinks.map((link, i) => {
+          const [startLink, endLink] = link
           const endPoint = [
-            link.target.dimensions.left - link.src.dimensions.left,
-            link.target.dimensions.top - link.src.dimensions.top
-          ];
+            endLink[0] - startLink[0],
+            endLink[1] - startLink[1],
+          ]
           return (
             <svg
-              key={link.src.id + link.src.target}
+              key={i}
               style={{
                 position: 'absolute',
-                left: link.src.dimensions.left,
+                left: startLink[0],
                 zIndex: 200,
-                top: link.src.dimensions.top,
+                top: startLink[1],
                 height: endPoint[1],
                 //handle case where endPoint is 0
-                width: endPoint[0] > 2? endPoint[0] : 2
+                width: endPoint[0] > 2 ? endPoint[0] : 2
               }}
             >
               <path
-                d={lineGenerator([
-                  [0, 0],
-                  endPoint
-                ])}
+                d={lineGenerator([[0, 0], endPoint])}
                 stroke="red"
                 strokeWidth="2"
                 fill="none"
