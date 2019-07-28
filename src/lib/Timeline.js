@@ -992,7 +992,8 @@ export default class ReactCalendarTimeline extends Component {
                 top: startLink[1],
                 height: endPoint[1],
                 //handle case where endPoint is 0
-                width: endPoint[0] > 2 ? endPoint[0] : 2
+                width: endPoint[0] > 2 ? endPoint[0] : 2,
+                pointerEvents: 'none'
               }}
             >
               <path
