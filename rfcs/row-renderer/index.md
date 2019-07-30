@@ -35,6 +35,8 @@ defined here.
 - might have some issues aligning everything espically vertical lines
 - remove some props (TODO: get the props which will change)
 - add complixity to library usage for custom changes
+- render vertical components that could cover more than 1 row
+- added layers might block some actions
 
 There are tradeoffs to choosing any path. Attempt to identify them here.
 
