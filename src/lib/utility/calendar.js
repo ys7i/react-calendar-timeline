@@ -692,8 +692,8 @@ export function calculateScrollCanvas(
     visibleTimeStart <= oldCanvasTimeStart + oldZoom * 1.5 &&
     visibleTimeEnd >= oldCanvasTimeStart + oldZoom * 1.5 &&
     visibleTimeEnd <= oldCanvasTimeStart + oldZoom * 2.5
-
   if (!canKeepCanvas || forceUpdateDimensions) {
+    console.log("update canvas")
     const [canvasTimeStart, canvasTimeEnd] = getCanvasBoundariesFromVisibleTime(
       visibleTimeStart,
       visibleTimeEnd

@@ -448,9 +448,13 @@ export default class ReactCalendarTimeline extends Component {
         oldZoom
     )
     if (componentScrollLeft !== scrollLeft) {
-      this.scrollComponent.scrollLeft = scrollLeft
-      this.scrollHeaderRef.scrollLeft = scrollLeft
+      requestAnimationFrame(this.scrollElements(scrollLeft));
     }
+  }
+
+  scrollElements = (left) => () => {
+    this.scrollComponent.scrollLeft = left
+    this.scrollHeaderRef.scrollLeft = left
   }
 
   resize = (props = this.props) => {
@@ -491,9 +495,7 @@ export default class ReactCalendarTimeline extends Component {
       groupHeights,
       groupTops
     })
-
-    this.scrollComponent.scrollLeft = width
-    this.scrollHeaderRef.scrollLeft = width
+    requestAnimationFrame(this.scrollElements(width));
   }
 
   onScroll = scrollX => {
@@ -507,9 +509,12 @@ export default class ReactCalendarTimeline extends Component {
     if (newScrollX > width * 1.5) {
       newScrollX -= width
     }
+    
+    if(scrollX !== newScrollX){
+      console.log("scroll on onScroll")
+      requestAnimationFrame(this.scrollElements(newScrollX));
 
-    this.scrollHeaderRef.scrollLeft = newScrollX
-    this.scrollComponent.scrollLeft = newScrollX
+    }
 
     const canvasTimeStart = this.state.canvasTimeStart
 
