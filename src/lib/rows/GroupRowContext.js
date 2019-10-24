@@ -1,15 +1,13 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
+import memoize from 'memoize-one'
 
 const defaultContextState = {
   clickTolerance: undefined,
   onContextMenu: undefined,
   onClick: undefined,
   onDoubleClick: undefined,
-  isEvenRow: undefined,
-  group: undefined,
-  horizontalLineClassNamesForGroup: undefined,
-  groupHeight: undefined
+  horizontalLineClassNamesForGroup: undefined
 }
 
 const GroupRowContext = React.createContext(defaultContextState)
@@ -22,30 +20,51 @@ export class GroupRowContextProvider extends PureComponent {
     onContextMenu: PropTypes.func.isRequired,
     onClick: PropTypes.func.isRequired,
     onDoubleClick: PropTypes.func.isRequired,
-    isEvenRow: PropTypes.bool.isRequired,
-    group: PropTypes.object.isRequired,
-    horizontalLineClassNamesForGroup: PropTypes.func,
-    groupHeight: PropTypes.number.isRequired,
-    groupIndex: PropTypes.number.isRequired,
+    horizontalLineClassNamesForGroup: PropTypes.func
   }
-  handleContextMenu = (e) => {
-    this.props.onContextMenu(e, this.props.groupIndex)
-  }
-  handleClick = (e) => {
-    this.props.onClick(e, this.props.groupIndex)
-  }
-  handleDoubleClick = (e) => {
-    this.props.onDoubleClick(e, this.props.groupIndex)
-  }
-  render() {
-    const { children, onContextMenu, onClick, onDoubleClick, ...rest } = this.props
-    const value = {
-      ...rest,
-      onContextMenu: this.handleContextMenu,
-      onClick: this.handleClick,
-      onDoubleClick: this.handleDoubleClick
+
+  getValue = memoize(
+    (
+      clickTolerance,
+      onContextMenu,
+      onClick,
+      onDoubleClick,
+      horizontalLineClassNamesForGroup
+    ) => {
+      console.log("getValue GroupRowContextProvider")
+      return {
+        clickTolerance,
+        onContextMenu,
+        onClick,
+        onDoubleClick,
+        horizontalLineClassNamesForGroup
+      }
     }
-    return <Provider value={value}>{children}</Provider>
+  )
+
+  render() {
+    const {
+      children,
+      clickTolerance,
+      onContextMenu,
+      onClick,
+      onDoubleClick,
+      horizontalLineClassNamesForGroup
+    } = this.props
+
+    return (
+      <Provider
+        value={this.getValue(
+          clickTolerance,
+          onContextMenu,
+          onClick,
+          onDoubleClick,
+          horizontalLineClassNamesForGroup
+        )}
+      >
+        {children}
+      </Provider>
+    )
   }
 }
 

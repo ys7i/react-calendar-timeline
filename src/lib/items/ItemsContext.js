@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 
 const defaultContextState = {
-  items: undefined,
   dragSnap: undefined,
   minResizeWidth: undefined,
   selectedItem: undefined,
@@ -20,10 +19,8 @@ const defaultContextState = {
   onItemContextMenu: undefined,
   itemRenderer: undefined,
   selected: undefined,
-  groupDimensions: undefined,
   useResizeHandle: undefined,
   scrollRef: undefined,
-  order: undefined,
   onDragStart: undefined,
   onDragEnd: undefined,
   onResizeStart: undefined,
@@ -40,7 +37,6 @@ const { Consumer, Provider } = ItemsContext
 
 export class ItemsContextProvider extends PureComponent {
   static propTypes = {
-    items: PropTypes.oneOfType([PropTypes.array, PropTypes.object]).isRequired,
     dragSnap: PropTypes.number,
     minResizeWidth: PropTypes.number,
     selectedItem: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -58,10 +54,8 @@ export class ItemsContextProvider extends PureComponent {
     onItemContextMenu: PropTypes.func,
     itemRenderer: PropTypes.func,
     selected: PropTypes.array,
-    groupDimensions: PropTypes.object,
     useResizeHandle: PropTypes.bool,
     scrollRef: PropTypes.object,
-    order: PropTypes.object,
     onDragStart: PropTypes.func.isRequired,
     onDragEnd: PropTypes.func.isRequired,
     onResizeStart: PropTypes.func.isRequired,

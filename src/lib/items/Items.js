@@ -2,8 +2,9 @@ import PropTypes from 'prop-types'
 import React, { PureComponent, Component } from 'react'
 import Item from './Item'
 import { TimelineStateConsumer } from '../timeline/TimelineStateContext'
-import {ItemsConsumer} from './ItemsContext'
+import { ItemsConsumer } from './ItemsContext'
 import { _get, arraysEqual } from '../utility/generic'
+import { RowConsumer } from '../rows/RowContext'
 
 const canResizeLeft = (item, canResize) => {
   const value =
@@ -56,11 +57,14 @@ export class Items extends Component {
 
     onDragStart: PropTypes.func.isRequired,
     onDragEnd: PropTypes.func.isRequired,
-    onResizeStart:  PropTypes.func.isRequired,
+    onResizeStart: PropTypes.func.isRequired,
     dragging: PropTypes.bool.isRequired,
     dragOffset: PropTypes.number.isRequired,
-    interactingItemId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    resizeEdge: PropTypes.oneOf(['right', 'left']),
+    interactingItemId: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number
+    ]),
+    resizeEdge: PropTypes.oneOf(['right', 'left'])
   }
 
   static defaultProps = {
@@ -99,72 +103,70 @@ export class Items extends Component {
     }
   }
 
-  isInteractingItem = (item) => {
-    return this.props.interactingItemId === _get(item, this.props.keys.itemIdKey)
+  isInteractingItem = item => {
+    return (
+      this.props.interactingItemId === _get(item, this.props.keys.itemIdKey)
+    )
   }
 
   render() {
-    const {
-      keys,
-      groupDimensions,
-      order,
-      items
-    } = this.props
+    const { keys, groupDimensions, order, items } = this.props
     const { itemIdKey } = keys
     return (
       <div className="rct-items">
         {items.map((item, i) => {
           const isInteractingItem = this.isInteractingItem(item)
           return (
-          <Item
-            key={_get(item, itemIdKey)}
-            item={item}
-            keys={this.props.keys}
-            order={order}
-            dimensions={groupDimensions.itemDimensions[i].dimensions}
-            selected={this.isSelected(item, itemIdKey)}
-            canChangeGroup={
-              _get(item, 'canChangeGroup') !== undefined
-                ? _get(item, 'canChangeGroup')
-                : this.props.canChangeGroup
-            }
-            canMove={
-              _get(item, 'canMove') !== undefined
-                ? _get(item, 'canMove')
-                : this.props.canMove
-            }
-            canResizeLeft={canResizeLeft(item, this.props.canResize)}
-            canResizeRight={canResizeRight(item, this.props.canResize)}
-            canSelect={
-              _get(item, 'canSelect') !== undefined
-                ? _get(item, 'canSelect')
-                : this.props.canSelect
-            }
-            useResizeHandle={this.props.useResizeHandle}
-            canvasTimeStart={this.props.canvasTimeStart}
-            canvasTimeEnd={this.props.canvasTimeEnd}
-            canvasWidth={this.props.canvasWidth}
-            dragSnap={this.props.dragSnap}
-            minResizeWidth={this.props.minResizeWidth}
-            onResizing={this.props.itemResizing}
-            onResized={this.props.itemResized}
-            moveResizeValidator={this.props.moveResizeValidator}
-            onDrag={this.props.itemDrag}
-            onDrop={this.props.itemDrop}
-            onItemDoubleClick={this.props.onItemDoubleClick}
-            onContextMenu={this.props.onItemContextMenu}
-            onSelect={this.props.itemSelect}
-            itemRenderer={this.props.itemRenderer}
-            scrollRef={this.props.scrollRef}
-            dragging={isInteractingItem && this.props.dragging}
-            resizing={isInteractingItem && this.props.resizing}
-            dragOffset={isInteractingItem ? this.props.dragOffset: 0}
-            resizeEdge={isInteractingItem ? this.props.resizeEdge: undefined}
-            onDragStart={this.props.onDragStart}
-            onDragEnd={this.props.onDragEnd}
-            onResizeStart={this.props.onResizeStart}
-          />
-        )})}
+            <Item
+              key={_get(item, itemIdKey)}
+              item={item}
+              keys={this.props.keys}
+              order={order}
+              dimensions={groupDimensions.itemDimensions[i].dimensions}
+              selected={this.isSelected(item, itemIdKey)}
+              canChangeGroup={
+                _get(item, 'canChangeGroup') !== undefined
+                  ? _get(item, 'canChangeGroup')
+                  : this.props.canChangeGroup
+              }
+              canMove={
+                _get(item, 'canMove') !== undefined
+                  ? _get(item, 'canMove')
+                  : this.props.canMove
+              }
+              canResizeLeft={canResizeLeft(item, this.props.canResize)}
+              canResizeRight={canResizeRight(item, this.props.canResize)}
+              canSelect={
+                _get(item, 'canSelect') !== undefined
+                  ? _get(item, 'canSelect')
+                  : this.props.canSelect
+              }
+              useResizeHandle={this.props.useResizeHandle}
+              canvasTimeStart={this.props.canvasTimeStart}
+              canvasTimeEnd={this.props.canvasTimeEnd}
+              canvasWidth={this.props.canvasWidth}
+              dragSnap={this.props.dragSnap}
+              minResizeWidth={this.props.minResizeWidth}
+              onResizing={this.props.itemResizing}
+              onResized={this.props.itemResized}
+              moveResizeValidator={this.props.moveResizeValidator}
+              onDrag={this.props.itemDrag}
+              onDrop={this.props.itemDrop}
+              onItemDoubleClick={this.props.onItemDoubleClick}
+              onContextMenu={this.props.onItemContextMenu}
+              onSelect={this.props.itemSelect}
+              itemRenderer={this.props.itemRenderer}
+              scrollRef={this.props.scrollRef}
+              dragging={isInteractingItem && this.props.dragging}
+              resizing={isInteractingItem && this.props.resizing}
+              dragOffset={isInteractingItem ? this.props.dragOffset : 0}
+              resizeEdge={isInteractingItem ? this.props.resizeEdge : undefined}
+              onDragStart={this.props.onDragStart}
+              onDragEnd={this.props.onDragEnd}
+              onResizeStart={this.props.onResizeStart}
+            />
+          )
+        })}
       </div>
     )
   }
@@ -184,13 +186,20 @@ class ItemsWrapper extends PureComponent {
           return (
             <ItemsConsumer>
               {props => (
-                <Items
-                  canvasTimeStart={canvasTimeStart}
-                  canvasTimeEnd={canvasTimeEnd}
-                  canvasWidth={canvasWidth}
-                  keys={keys}
-                  {...props}
-                />
+                <RowConsumer>
+                  {({items, groupDimensions}) => (
+                    <Items
+                      canvasTimeStart={canvasTimeStart}
+                      canvasTimeEnd={canvasTimeEnd}
+                      canvasWidth={canvasWidth}
+                      keys={keys}
+                      items={items}
+                      groupDimensions={groupDimensions}
+                      order={groupDimensions}
+                      {...props}
+                    />
+                  )}
+                </RowConsumer>
               )}
             </ItemsConsumer>
           )

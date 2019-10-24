@@ -319,7 +319,8 @@ export default class ReactCalendarTimeline extends Component {
       groupsWithItemsDimensions,
       height,
       groupHeights,
-      groupTops
+      groupTops,
+      itemsWithInteractions,
     } = stackTimelineItems(
       props.items,
       props.groups,
@@ -343,6 +344,7 @@ export default class ReactCalendarTimeline extends Component {
     this.state.height = height
     this.state.groupHeights = groupHeights
     this.state.groupTops = groupTops
+    this.state.itemsWithInteractions = itemsWithInteractions
 
     /* eslint-enable */
   }
@@ -891,7 +893,7 @@ export default class ReactCalendarTimeline extends Component {
       canvasTimeStart,
       canvasTimeEnd
     } = this.state
-    let { groupsWithItemsDimensions, height, groupHeights, groupTops } = this.state
+    let { groupsWithItemsDimensions, height, groupHeights, groupTops, itemsWithInteractions } = this.state
 
     const zoom = visibleTimeEnd - visibleTimeStart
     const canvasWidth = getCanvasWidth(width)
@@ -921,6 +923,7 @@ export default class ReactCalendarTimeline extends Component {
       height = stackResults.height
       groupHeights = stackResults.groupHeights
       groupTops = stackResults.groupTops
+      itemsWithInteractions = stackResults.itemsWithInteractions
     }
 
     const outerComponentStyle = {
@@ -948,7 +951,7 @@ export default class ReactCalendarTimeline extends Component {
           >
             <HelpersContextProvider
               groupsWithItemsDimensions={groupsWithItemsDimensions}
-              items={items}
+              items={isInteractingWithItem? itemsWithInteractions : items}
               keys={keys}
               groupHeights={groupHeights}
               groupTops={groupTops}
@@ -1008,7 +1011,7 @@ export default class ReactCalendarTimeline extends Component {
                         onRowContextClick={this.handleScrollContextMenu}
                         groupsWithItemsDimensions={groupsWithItemsDimensions}
                         groups={groups}
-                        items={items}
+                        items={isInteractingWithItem? itemsWithInteractions : items}
                         keys={keys}
                         resizeEdge={this.state.resizingEdge}
                       />

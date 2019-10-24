@@ -5,6 +5,7 @@ import interact from 'interactjs'
 import { _get } from '../utility/generic'
 import { GroupRowConsumer } from './GroupRowContext'
 import { TimelineStateConsumer } from '../timeline/TimelineStateContext'
+import { RowConsumer } from './RowContext'
 
 class GroupRow extends Component {
   static propTypes = {
@@ -29,6 +30,15 @@ class GroupRow extends Component {
     })
   }
 
+  handleContextMenu = (e) => {
+    this.props.onContextMenu(e, this.props.groupIndex)
+  }
+
+  handleDoubleClick = (e) => {
+    this.props.onDoubleClick(e, this.props.groupIndex)
+  }
+
+
   render() {
     const {
       onContextMenu,
@@ -41,7 +51,8 @@ class GroupRow extends Component {
       children,
       keys,
       canvasWidth,
-      groupHeight
+      groupHeight,
+      groupIndex
     } = this.props
     let classNamesForGroup = []
     if (horizontalLineClassNamesForGroup) {
@@ -49,11 +60,11 @@ class GroupRow extends Component {
     }
 
     return (
-      <PreventClickOnDrag clickTolerance={clickTolerance} onClick={onClick}>
+      <PreventClickOnDrag clickTolerance={clickTolerance} groupIndex={groupIndex} onClick={onClick}>
         <div
           ref={this.ref}
-          onContextMenu={onContextMenu}
-          onDoubleClick={onDoubleClick}
+          onContextMenu={this.handleContextMenu}
+          onDoubleClick={this.handleDoubleClick}
           className={
             'rct-hl ' +
             (isEvenRow ? 'rct-hl-even ' : 'rct-hl-odd ') +
@@ -84,13 +95,23 @@ class GroupRowWrapper extends PureComponent {
           return (
             <GroupRowConsumer>
               {props => (
-                <GroupRow
-                  canvasWidth={canvasWidth}
-                  keys={keys}
-                  canvasWidth={canvasWidth}
-                  {...props}
-                  children={this.props.children}
-                />
+                <RowConsumer>
+                  {({groupIndex, groupDimensions, groupHeight}) => {
+                    return (
+                      <GroupRow
+                        canvasWidth={canvasWidth}
+                        keys={keys}
+                        canvasWidth={canvasWidth}
+                        isEvenRow={groupIndex % 2 === 0}
+                        group={groupDimensions.group}
+                        groupHeight={groupHeight}
+                        groupIndex={groupIndex}
+                        {...props}
+                        children={this.props.children}
+                      />
+                    )
+                  }}
+                </RowConsumer>
               )}
             </GroupRowConsumer>
           )
