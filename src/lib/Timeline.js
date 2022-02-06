@@ -267,11 +267,7 @@ export default class ReactCalendarTimeline extends Component {
   }
 
   getTimelineUnit = () => {
-    const {
-      width,
-      visibleTimeStart,
-      visibleTimeEnd
-    } = this.state
+    const { width, visibleTimeStart, visibleTimeEnd } = this.state
 
     const { timeSteps } = this.props
 
@@ -286,7 +282,7 @@ export default class ReactCalendarTimeline extends Component {
 
     this.getSelected = this.getSelected.bind(this)
     this.hasSelectedItem = this.hasSelectedItem.bind(this)
-    this.isItemSelected= this.isItemSelected.bind(this)
+    this.isItemSelected = this.isItemSelected.bind(this)
 
     let visibleTimeStart = null
     let visibleTimeEnd = null
@@ -452,17 +448,17 @@ export default class ReactCalendarTimeline extends Component {
 
     // Check the scroll is correct
     const scrollLeft = Math.round(
-      this.state.width *
-        (this.state.visibleTimeStart - this.state.canvasTimeStart) /
+      (this.state.width *
+        (this.state.visibleTimeStart - this.state.canvasTimeStart)) /
         newZoom
     )
     const componentScrollLeft = Math.round(
-      prevState.width *
-        (prevState.visibleTimeStart - prevState.canvasTimeStart) /
+      (prevState.width *
+        (prevState.visibleTimeStart - prevState.canvasTimeStart)) /
         oldZoom
     )
+    this.scrollComponent.scrollLeft = scrollLeft
     if (componentScrollLeft !== scrollLeft) {
-      this.scrollComponent.scrollLeft = scrollLeft
       this.scrollHeaderRef.scrollLeft = scrollLeft
     }
   }
@@ -517,7 +513,7 @@ export default class ReactCalendarTimeline extends Component {
 
     const zoom = this.state.visibleTimeEnd - this.state.visibleTimeStart
 
-    const visibleTimeStart = canvasTimeStart + zoom * scrollX / width
+    const visibleTimeStart = canvasTimeStart + (zoom * scrollX) / width
 
     if (
       this.state.visibleTimeStart !== visibleTimeStart ||
@@ -554,7 +550,7 @@ export default class ReactCalendarTimeline extends Component {
   }
 
   handleWheelZoom = (speed, xPosition, deltaY) => {
-    this.changeZoom(1.0 + speed * deltaY / 500, xPosition / this.state.width)
+    this.changeZoom(1.0 + (speed * deltaY) / 500, xPosition / this.state.width)
   }
 
   changeZoom = (scale, offset = 0.5) => {
@@ -839,7 +835,9 @@ export default class ReactCalendarTimeline extends Component {
         itemDrag={this.dragItem}
         itemDrop={this.dropItem}
         onItemDoubleClick={this.doubleClickItem}
-        onItemContextMenu={this.props.onItemContextMenu ? this.contextMenuClickItem : undefined}
+        onItemContextMenu={
+          this.props.onItemContextMenu ? this.contextMenuClickItem : undefined
+        }
         itemResizing={this.resizingItem}
         itemResized={this.resizedItem}
         itemRenderer={this.props.itemRenderer}
@@ -891,9 +889,9 @@ export default class ReactCalendarTimeline extends Component {
    * check if child of type TimelineHeader
    * refer to for explanation https://github.com/gaearon/react-hot-loader#checking-element-types
    */
-  isTimelineHeader = (child) => {
-    if(child.type === undefined) return false
-    return child.type.secretKey ===TimelineHeaders.secretKey
+  isTimelineHeader = child => {
+    if (child.type === undefined) return false
+    return child.type.secretKey === TimelineHeaders.secretKey
   }
 
   childrenWithProps(
@@ -968,21 +966,21 @@ export default class ReactCalendarTimeline extends Component {
   getSelected() {
     return this.state.selectedItem && !this.props.selected
       ? [this.state.selectedItem]
-      : this.props.selected || [];
+      : this.props.selected || []
   }
 
-  hasSelectedItem(){
-    if(!Array.isArray(this.props.selected)) return !!this.state.selectedItem
+  hasSelectedItem() {
+    if (!Array.isArray(this.props.selected)) return !!this.state.selectedItem
     return this.props.selected.length > 0
   }
 
-  isItemSelected(itemId){
+  isItemSelected(itemId) {
     const selectedItems = this.getSelected()
     return selectedItems.some(i => i === itemId)
   }
   getScrollElementRef = el => {
-    this.props.scrollRef(el)
     this.scrollComponent = el
+    this.props.scrollRef(el)
   }
 
   render() {
@@ -1067,6 +1065,7 @@ export default class ReactCalendarTimeline extends Component {
                 {sidebarWidth > 0 ? this.sidebar(height, groupHeights) : null}
                 <ScrollElement
                   scrollRef={this.getScrollElementRef}
+                  componentRef={this.componentRef}
                   width={width}
                   height={height}
                   onZoom={this.changeZoom}
